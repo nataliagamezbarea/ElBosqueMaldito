@@ -15,43 +15,49 @@ public class ThirdPersonShooterController : MonoBehaviour
 
     private ThirdPersonController thirdPersonController;
     private StarterAssetsInputs starterAssetsInputs;
+    private Animator animator;
 
     private void Awake()
     {
         starterAssetsInputs = GetComponent<StarterAssetsInputs>();
         thirdPersonController = GetComponent<ThirdPersonController>();
+        animator = GetComponent<Animator>();
     }
 
     private void Update() {
-    Vector3 mouseWorldPosition = Vector3.zero;
-    Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
-    Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
+        Vector3 mouseWorldPosition = Vector3.zero;
+        Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
+        Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
 
-    if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, aimColliderLayerMask)) {
-        debugTransform.position = raycastHit.point;
-        mouseWorldPosition = raycastHit.point;
-    } else {
-        mouseWorldPosition = ray.GetPoint(999f);
-    }
+        if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, aimColliderLayerMask)) {
+            debugTransform.position = raycastHit.point;
+            mouseWorldPosition = raycastHit.point;
+        } else {
+            mouseWorldPosition = ray.GetPoint(999f);
+        }
 
-    if (starterAssetsInputs.aim) {
-        aimVirtualCamera.gameObject.SetActive(true);
-        thirdPersonController.SetSensitivity(aimSensitivity);
+        if (starterAssetsInputs.aim) {
+            aimVirtualCamera.gameObject.SetActive(true);
+            thirdPersonController.SetSensitivity(aimSensitivity);
+            
+            animator.SetBool("IsAiming", true); 
 
-        Vector3 worldAimTarget = mouseWorldPosition;
-        worldAimTarget.y = transform.position.y;
-        Vector3 aimDirection = (worldAimTarget - transform.position).normalized;
+            Vector3 worldAimTarget = mouseWorldPosition;
+            worldAimTarget.y = transform.position.y;
+            Vector3 aimDirection = (worldAimTarget - transform.position).normalized;
 
-        transform.forward = Vector3.Lerp(transform.forward, aimDirection, Time.deltaTime * 20f);
-    } else {
-        aimVirtualCamera.gameObject.SetActive(false);
-        thirdPersonController.SetSensitivity(normalSensitivity);
-    }
+            transform.forward = Vector3.Lerp(transform.forward, aimDirection, Time.deltaTime * 20f);
+        } else {
+            aimVirtualCamera.gameObject.SetActive(false);
+            thirdPersonController.SetSensitivity(normalSensitivity);
 
-   if (starterAssetsInputs.shoot) {
+            animator.SetBool("IsAiming", false);
+        }
+
+        if (starterAssetsInputs.shoot) {
             Vector3 aimDir = (mouseWorldPosition - spawnBulletPosition.position).normalized;
             Instantiate(pfBulletProjectile, spawnBulletPosition.position, Quaternion.LookRotation(aimDir, Vector3.up));
             starterAssetsInputs.shoot = false;
         }
-}
+    }
 }
