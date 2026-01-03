@@ -8,9 +8,11 @@ public class BulletProjectile : MonoBehaviour {
     [SerializeField] private Transform vfxHitRed;
 
     private Rigidbody bulletRigidbody;
+    private TrailRenderer trail;
 
     private void Awake() {
         bulletRigidbody = GetComponent<Rigidbody>();
+        trail = GetComponent<TrailRenderer>();
     }
 
     private void Start() {
@@ -24,7 +26,12 @@ public class BulletProjectile : MonoBehaviour {
         } else {
             Instantiate(vfxHitRed, transform.position, Quaternion.identity);
         }
-        
+
+        if (trail != null) {
+            trail.transform.parent = null;
+            Destroy(trail.gameObject, trail.time);
+        }
+
         Destroy(gameObject);
     }
 }
