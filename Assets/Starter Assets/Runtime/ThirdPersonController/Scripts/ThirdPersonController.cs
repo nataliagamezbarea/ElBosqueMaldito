@@ -7,6 +7,8 @@ using UnityEngine.InputSystem;
 /* Note: animations are called via the controller for both the character and capsule using animator null checks
  */
 
+ 
+
 namespace StarterAssets
 {
     [RequireComponent(typeof(CharacterController))]
@@ -124,6 +126,7 @@ namespace StarterAssets
             }
         }
 
+        public bool RotateOnMove { get; private set; }
 
         private void Awake()
         {
@@ -394,6 +397,11 @@ namespace StarterAssets
         public void SetSensitivity(float newSensitivity)
         {
             Sensitivity = newSensitivity;
+        }
+
+        public void SetRotateOnMove(bool newRotateOnMove)
+        {
+            RotateOnMove = newRotateOnMove;
         }
     }
 }
