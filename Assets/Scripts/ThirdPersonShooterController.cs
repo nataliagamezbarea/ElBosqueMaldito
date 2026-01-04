@@ -6,6 +6,9 @@ using UnityEngine.Animations.Rigging;
 
 public class ThirdPersonShooterController : MonoBehaviour
 {
+    [Header("Referencias de Sistema")]
+    [SerializeField] private SwitchCameraSystem cameraSystem; 
+
     [SerializeField] private Rig aimRig;
     [SerializeField] private GameObject aimVirtualCamera;
     [SerializeField] private float normalSensitivity = 2f;
@@ -30,6 +33,8 @@ public class ThirdPersonShooterController : MonoBehaviour
 
     private void Update()
     {
+        bool es3P = (cameraSystem != null) ? cameraSystem.EsTerceraPersona : true;
+
         Vector3 mouseWorldPosition = Vector3.zero;
         Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
         Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
@@ -37,29 +42,37 @@ public class ThirdPersonShooterController : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit, 999f, aimColliderLayerMask))
         {
             mouseWorldPosition = hit.point;
-            if (debugTransform != null)
-                debugTransform.position = hit.point;
+            if (debugTransform != null) debugTransform.position = hit.point;
         }
         else
         {
             mouseWorldPosition = ray.GetPoint(999f);
         }
 
-        bool isAiming = starterAssetsInputs.aim || starterAssetsInputs.shoot;
+        bool isAiming = !es3P || starterAssetsInputs.aim || starterAssetsInputs.shoot;
 
         if (isAiming)
         {
-            aimVirtualCamera.SetActive(true);
+            if (es3P) aimVirtualCamera.SetActive(true);
+            else aimVirtualCamera.SetActive(false);
+
             thirdPersonController.SetSensitivity(aimSensitivity);
-            thirdPersonController.SetRotateOnMove(false);
+            
+            Vector3 worldCameraForward = Camera.main.transform.forward;
+            worldCameraForward.y = 0; 
+
+            if (worldCameraForward != Vector3.zero)
+            {
+                if (es3P)
+                {
+                    thirdPersonController.SetRotateOnMove(false);
+                    Quaternion targetRotation = Quaternion.LookRotation(worldCameraForward);
+                    transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * 20f);
+                }
+            }
+            
             animator.SetBool("IsAiming", true);
             aimRigWeight = 1f;
-
-            Vector3 worldAimTarget = mouseWorldPosition;
-            worldAimTarget.y = transform.position.y;
-            Vector3 aimDirection = (worldAimTarget - transform.position).normalized;
-
-            transform.forward = Vector3.Lerp(transform.forward, aimDirection, Time.deltaTime * 20f);
         }
         else
         {
@@ -74,13 +87,11 @@ public class ThirdPersonShooterController : MonoBehaviour
 
         if (starterAssetsInputs.shoot)
         {
+            animator.SetTrigger("Shoot");
+            
             Vector3 aimDir = (mouseWorldPosition - spawnBulletPosition.position).normalized;
-            Instantiate(
-                pfBulletProjectile,
-                spawnBulletPosition.position,
-                Quaternion.LookRotation(aimDir, Vector3.up)
-            );
-
+            Instantiate(pfBulletProjectile, spawnBulletPosition.position, Quaternion.LookRotation(aimDir, Vector3.up));
+            
             starterAssetsInputs.shoot = false;
         }
     }
