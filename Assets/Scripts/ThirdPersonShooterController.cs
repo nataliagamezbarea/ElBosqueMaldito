@@ -45,7 +45,6 @@ public class ThirdPersonShooterController : MonoBehaviour
             mouseWorldPosition = ray.GetPoint(999f);
         }
 
-        // 🔥 Disparar implica apuntar
         bool isAiming = starterAssetsInputs.aim || starterAssetsInputs.shoot;
 
         if (isAiming)
