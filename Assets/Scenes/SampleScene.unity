@@ -594,6 +594,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &548022854
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 548022856}
+  - component: {fileID: 548022855}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &548022855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 548022854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54a9cbce832b6444583ed1ab40f34031, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sonidos:
+  - nombre: Disparo
+    clip: {fileID: 8300000, guid: 956190b10d1f82248afe6772afe2f646, type: 3}
+    volumen: 1
+    tono: 1
+    loop: 0
+    source: {fileID: 0}
+--- !u!4 &548022856
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 548022854}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 525.99554, y: 0.9394436, z: 498.0229}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &622342434
 GameObject:
   m_ObjectHideFlags: 0
@@ -638,27 +689,31 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1430634103397450859, guid: 9c489a8547f4d9e4387da15a4ff82c81, type: 3}
       propertyPath: CameraSide
-      value: 0.722
+      value: 0.906
       objectReference: {fileID: 0}
     - target: {fileID: 1430634103397450859, guid: 9c489a8547f4d9e4387da15a4ff82c81, type: 3}
       propertyPath: CameraDistance
-      value: 0.67
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 1430634103397450859, guid: 9c489a8547f4d9e4387da15a4ff82c81, type: 3}
       propertyPath: ShoulderOffset.x
-      value: 1.01
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: 1430634103397450859, guid: 9c489a8547f4d9e4387da15a4ff82c81, type: 3}
       propertyPath: ShoulderOffset.y
-      value: 0.24
+      value: 0.17
       objectReference: {fileID: 0}
     - target: {fileID: 1430634103397450859, guid: 9c489a8547f4d9e4387da15a4ff82c81, type: 3}
       propertyPath: ShoulderOffset.z
-      value: 0.36
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 1430634103397450859, guid: 9c489a8547f4d9e4387da15a4ff82c81, type: 3}
       propertyPath: VerticalArmLength
       value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 1430634103397450859, guid: 9c489a8547f4d9e4387da15a4ff82c81, type: 3}
+      propertyPath: AvoidObstacles.IgnoreTag
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 1503428078145656722, guid: 9c489a8547f4d9e4387da15a4ff82c81, type: 3}
       propertyPath: Priority.Enabled
@@ -690,15 +745,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8762286023885395322, guid: 9c489a8547f4d9e4387da15a4ff82c81, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 526.2484
+      value: 526.53076
       objectReference: {fileID: 0}
     - target: {fileID: 8762286023885395322, guid: 9c489a8547f4d9e4387da15a4ff82c81, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.26999998
+      value: 0.19999993
       objectReference: {fileID: 0}
     - target: {fileID: 8762286023885395322, guid: 9c489a8547f4d9e4387da15a4ff82c81, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 501.68997
+      value: 501.85
       objectReference: {fileID: 0}
     - target: {fileID: 8762286023885395322, guid: 9c489a8547f4d9e4387da15a4ff82c81, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1666,7 +1721,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2070925441746177912, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 527.72
+      value: 527.1
       objectReference: {fileID: 0}
     - target: {fileID: 2070925441746177912, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1674,7 +1729,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2070925441746177912, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 496
+      value: 496.9
       objectReference: {fileID: 0}
     - target: {fileID: 2070925441746177912, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1714,11 +1769,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2299327365379763560, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
       propertyPath: CameraDistance
-      value: 2
+      value: 1.1
       objectReference: {fileID: 0}
     - target: {fileID: 2299327365379763560, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
       propertyPath: ShoulderOffset.x
-      value: 1.72
+      value: 1.1
       objectReference: {fileID: 0}
     - target: {fileID: 2299327365379763560, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
       propertyPath: ShoulderOffset.y
@@ -3027,7 +3082,7 @@ Transform:
   m_GameObject: {fileID: 9126141635942143633}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 527.51996, y: 0.35000002, z: 500}
+  m_LocalPosition: {x: 526.89996, y: 0.35000002, z: 500.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6621,3 +6676,4 @@ SceneRoots:
   - {fileID: 1986067076}
   - {fileID: 2122714288}
   - {fileID: 1880464333}
+  - {fileID: 548022856}

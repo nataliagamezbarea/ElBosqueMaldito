@@ -21,7 +21,6 @@ public class ThirdPersonShooterController : MonoBehaviour
     private ThirdPersonController thirdPersonController;
     private StarterAssetsInputs starterAssetsInputs;
     private Animator animator;
-
     private float aimRigWeight;
 
     private void Awake()
@@ -35,18 +34,29 @@ public class ThirdPersonShooterController : MonoBehaviour
     {
         bool es3P = (cameraSystem != null) ? cameraSystem.EsTerceraPersona : true;
 
+        // --- CÁLCULO DEL PUNTO DE MIRA ---
         Vector3 mouseWorldPosition = Vector3.zero;
         Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
         Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
 
-        if (Physics.Raycast(ray, out RaycastHit hit, 999f, aimColliderLayerMask))
+        // Si estamos en 1P, adelantamos el origen del rayo para no chocar con nosotros mismos
+        Vector3 rayOrigin = es3P ? ray.origin : ray.GetPoint(0.5f); 
+
+        // Realizamos el Raycast filtrando la capa "Player"
+        if (Physics.Raycast(rayOrigin, ray.direction, out RaycastHit hit, 999f, aimColliderLayerMask))
         {
             mouseWorldPosition = hit.point;
-            if (debugTransform != null) debugTransform.position = hit.point;
         }
         else
         {
             mouseWorldPosition = ray.GetPoint(999f);
+        }
+
+        // Posicionamos el debugTransform (la esfera)
+        if (debugTransform != null) 
+        {
+            // Usamos un movimiento suave para evitar vibraciones visuales
+            debugTransform.position = Vector3.Lerp(debugTransform.position, mouseWorldPosition, Time.deltaTime * 40f);
         }
 
         bool isAiming = !es3P || starterAssetsInputs.aim || starterAssetsInputs.shoot;
@@ -63,6 +73,7 @@ public class ThirdPersonShooterController : MonoBehaviour
 
             if (worldCameraForward != Vector3.zero)
             {
+                // En 3P rotamos el cuerpo, en 1P dejamos que el FirstPersonController lo haga solo
                 if (es3P)
                 {
                     thirdPersonController.SetRotateOnMove(false);
@@ -88,7 +99,8 @@ public class ThirdPersonShooterController : MonoBehaviour
         if (starterAssetsInputs.shoot)
         {
             animator.SetTrigger("Shoot");
-            
+            if (AudioManager.Instance != null) AudioManager.Instance.PlayOneShot("Disparo");
+
             Vector3 aimDir = (mouseWorldPosition - spawnBulletPosition.position).normalized;
             Instantiate(pfBulletProjectile, spawnBulletPosition.position, Quaternion.LookRotation(aimDir, Vector3.up));
             
