@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4699967739435152}
   - component: {fileID: 33652085307817142}
   - component: {fileID: 23968705409988316}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Conifer Small BOTD LOD1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58,6 +58,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -94,7 +97,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4454104241866706}
   - component: {fileID: 227092337440914680}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Conifer Small BOTD Billboard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,6 +136,9 @@ BillboardRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
@@ -169,7 +175,7 @@ GameObject:
   - component: {fileID: 4689083990643298}
   - component: {fileID: 205709636835153214}
   - component: {fileID: 136614995598757014}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PF Conifer Small BOTD URP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -255,7 +261,7 @@ GameObject:
   - component: {fileID: 4591230394645006}
   - component: {fileID: 33710429429353474}
   - component: {fileID: 23713938712392732}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Conifer Small BOTD LOD0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -302,6 +308,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
