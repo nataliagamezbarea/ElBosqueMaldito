@@ -1,101 +1,93 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class ZombieSpawner : MonoBehaviour
 {
     public GameObject[] zombiePrefabs;
     
-    [Header("Configuración de Oleadas")]
-    public int maxZombiesAlMismoTiempo = 30; // Límite para evitar lag
-    public float tiempoEntreSpawns = 5f;    // Aparece uno cada 5 segundos
+    [Header("Límites de Población")]
+    public int maxZombiesTotales = 2; 
+    public float tiempoChequeo = 6f; 
 
-    [Header("Cámaras")]
-    public Camera firstPersonCam;
-    public Camera thirdPersonCam;
+    [Header("Dificultad Progresiva")]
+    public float velocidadInicial = 3.5f;
+    public float aumentoPorBaja = 0.15f;
+    public float velocidadMaxima = 7.5f;
 
     [Header("Rango de Aparición")]
-    public float minDistance = 15f; 
+    public float minDistance = 20f; 
     public float maxDistance = 40f; 
 
     private Transform player;
-    private int zombiesActuales = 0;
+    private float velocidadActual;
+    
+    // Lista para rastrear qué prefabs están vivos actualmente
+    private List<GameObject> prefabsEnEscena = new List<GameObject>();
 
-    void Start()
-    {
+    void Start() {
+        velocidadActual = velocidadInicial;
         player = GameObject.FindGameObjectWithTag("Player").transform;
-
-        // Iniciamos la rutina de aparición infinita
-        StartCoroutine(RutinaSpawnInfinita());
+        StartCoroutine(BucleDeSpawn());
     }
 
-    IEnumerator RutinaSpawnInfinita()
-    {
-        while (true) // Bucle infinito
-        {
-            // Solo spawnea si no hemos llegado al límite
-            if (zombiesActuales < maxZombiesAlMismoTiempo)
-            {
+    IEnumerator BucleDeSpawn() {
+        while (true) {
+            if (prefabsEnEscena.Count < maxZombiesTotales) {
                 SpawnZombie();
             }
-
-            // Espera el tiempo configurado antes de intentar el siguiente
-            yield return new WaitForSeconds(tiempoEntreSpawns);
+            yield return new WaitForSeconds(tiempoChequeo);
         }
     }
 
-    void SpawnZombie()
-    {
-        Camera activeCam = GetActiveCamera();
-        Camera camToUse = activeCam != null ? activeCam : Camera.main;
+    void SpawnZombie() {
+        if (zombiePrefabs.Length < 2) {
+            Debug.LogWarning("Necesitas al menos 2 prefabs diferentes en la lista para que no se repitan.");
+            if (zombiePrefabs.Length == 0) return;
+        }
 
-        Vector3 spawnPos = Vector3.zero;
-        bool validPoint = false;
+        Vector2 randomCircle = Random.insideUnitCircle.normalized * Random.Range(minDistance, maxDistance);
+        Vector3 candidatePoint = new Vector3(player.position.x + randomCircle.x, player.position.y, player.position.z + randomCircle.y);
 
-        for (int i = 0; i < 30; i++) 
-        {
-            Vector2 randomCircle = Random.insideUnitCircle.normalized * Random.Range(minDistance, maxDistance);
-            Vector3 candidatePoint = new Vector3(player.position.x + randomCircle.x, player.position.y, player.position.z + randomCircle.y);
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(candidatePoint, out hit, 15f, NavMesh.AllAreas)) {
+            
+            GameObject prefabAElegir = null;
 
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(candidatePoint, out hit, 10f, NavMesh.AllAreas))
-            {
-                Vector3 screenPoint = camToUse.WorldToViewportPoint(hit.position);
+            // Lógica para elegir uno que NO esté en escena
+            List<GameObject> opcionesDisponibles = new List<GameObject>(zombiePrefabs);
+            
+            // Eliminamos de las opciones los que ya están vivos (comparando por nombre o referencia)
+            foreach (GameObject vivo in prefabsEnEscena) {
+                opcionesDisponibles.RemoveAll(p => p.name == vivo.name.Replace("(Clone)", "").Trim());
+            }
 
-                // Verificamos que esté fuera de cámara
-                bool isOffScreen = screenPoint.z < 0 || screenPoint.x < -0.05f || screenPoint.x > 1.05f || screenPoint.y < -0.05f || screenPoint.y > 1.05f;
+            if (opcionesDisponibles.Count > 0) {
+                prefabAElegir = opcionesDisponibles[Random.Range(0, opcionesDisponibles.Count)];
+            } else {
+                // Si por alguna razón no hay opciones, elegimos uno al azar para no romper el spawn
+                prefabAElegir = zombiePrefabs[Random.Range(0, zombiePrefabs.Length)];
+            }
 
-                if (isOffScreen)
-                {
-                    spawnPos = hit.position;
-                    validPoint = true;
-                    break;
-                }
+            GameObject nuevoZombie = Instantiate(prefabAElegir, hit.position, Quaternion.identity);
+            prefabsEnEscena.Add(nuevoZombie);
+            
+            NavMeshAgent agent = nuevoZombie.GetComponent<NavMeshAgent>();
+            if (agent != null) {
+                agent.speed = velocidadActual;
             }
         }
+    }
 
-        if (validPoint)
-        {
-            GameObject prefab = zombiePrefabs[Random.Range(0, zombiePrefabs.Length)];
-            GameObject nuevoZombie = Instantiate(prefab, spawnPos, Quaternion.identity);
-            
-            zombiesActuales++;
-            
-            // OPCIONAL: Si el zombie muere, avisar al spawner para que cree otro
-            // Para esto necesitarías un script de salud en el zombie que llame a ReducirContador()
+    public void ZombieMuerto(GameObject zombieQueMurio) {
+        // Quitamos este zombie específico de la lista de seguimiento
+        if (prefabsEnEscena.Contains(zombieQueMurio)) {
+            prefabsEnEscena.Remove(zombieQueMurio);
         }
-    }
-
-    Camera GetActiveCamera()
-    {
-        if (firstPersonCam != null && firstPersonCam.gameObject.activeInHierarchy) return firstPersonCam;
-        if (thirdPersonCam != null && thirdPersonCam.gameObject.activeInHierarchy) return thirdPersonCam;
-        return null;
-    }
-
-    // Método para llamar cuando un zombie muera
-    public void ZombieMuerto()
-    {
-        zombiesActuales--;
+        
+        if (velocidadActual < velocidadMaxima) {
+            velocidadActual += aumentoPorBaja;
+        }
     }
 }

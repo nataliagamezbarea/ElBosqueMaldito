@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI; // Necesario para controlar el NavMeshAgent
+using UnityEngine.AI;
 
 public class BulletProjectile : MonoBehaviour {
 
@@ -19,7 +19,6 @@ public class BulletProjectile : MonoBehaviour {
 
     private void Start() {
         float speed = 100f;
-        
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         Vector3 targetPoint;
 
@@ -38,38 +37,46 @@ public class BulletProjectile : MonoBehaviour {
         if (other.CompareTag("Player")) return;
 
         if (other.CompareTag("Enemy")) {
-            Debug.Log("Hit Enemy");
-            Instantiate(vfxHitGreen, transform.position, Quaternion.identity);
-            
-            // 1. Detener el movimiento de la IA
+            // Notificar al Spawner pasando el objeto que ha muerto
+            ZombieSpawner spawner = Object.FindFirstObjectByType<ZombieSpawner>();
+            if (spawner != null) {
+                spawner.ZombieMuerto(other.gameObject);
+            }
+
+            // Desactivar IA
             NavMeshAgent agent = other.GetComponent<NavMeshAgent>();
             if (agent != null) {
-                agent.isStopped = true; // Detiene el avance
-                agent.enabled = false;  // Desactiva el componente para evitar conflictos
+                agent.isStopped = true;
+                agent.enabled = false;
             }
 
-            // 2. Activar animación de muerte
+            // Animación de muerte
             Animator enemyAnim = other.GetComponent<Animator>();
-            if (enemyAnim != null) {
-                enemyAnim.SetBool("die", true);
-            }
+            if (enemyAnim != null) enemyAnim.SetBool("die", true);
 
-            // 3. Desactivar físicas y tags para que se quede como cadáver decorativo
-            Collider enemyCollider = other.GetComponent<Collider>();
-            if (enemyCollider != null) {
-                enemyCollider.enabled = false;
-            }
-            other.gameObject.tag = "Untagged";
+            // Cambiar Tag para que no reciba más impactos
+            other.gameObject.tag = "Untagged"; 
+            
+            // Desactivar colisiones para que el jugador pase a través del cadáver
+            if(other.GetComponent<Collider>()) other.GetComponent<Collider>().enabled = false;
 
+            // OPCIONAL: Si el zombie tiene Rigidbody, lo hacemos cinemático para que no ruede raro
+            Rigidbody zombieRb = other.GetComponent<Rigidbody>();
+            if (zombieRb != null) zombieRb.isKinematic = true;
+
+            // --- SE HA ELIMINADO EL DESTROY(other.gameObject) PARA CONSERVAR EL CADÁVER ---
+
+            Instantiate(vfxHitGreen, transform.position, Quaternion.identity);
         } else {
             Instantiate(vfxHitRed, transform.position, Quaternion.identity);
         }
 
+        // Limpieza del proyectil y el rastro
         if (trail != null) {
             trail.transform.parent = null;
             Destroy(trail.gameObject, trail.time);
         }
-
-        Destroy(gameObject);
+        
+        Destroy(gameObject); // Siempre destruir la bala al chocar
     }
 }

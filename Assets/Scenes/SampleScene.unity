@@ -299,16 +299,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zombiePrefabs:
-  - {fileID: 4389119823599776965, guid: 0dd3115b8639b4f4998e3099c1abcbdf, type: 3}
-  - {fileID: 7477617860620891207, guid: dde0f63ca7a312349afadfe65cd991f4, type: 3}
-  - {fileID: 921440160144824483, guid: 9cb5d8ec6910ab349ae1bcca71e83304, type: 3}
-  - {fileID: 9217258587224486026, guid: 12cd442611ba3814d87bdd4d730b7ffa, type: 3}
-  - {fileID: 3299051634189019240, guid: 2e8bacd303c6b9040937d2e144a6a32b, type: 3}
-  - {fileID: 1461963014325837019, guid: 69c376529fde7b243910c309fb85bfcd, type: 3}
-  maxZombiesAlMismoTiempo: 30
-  tiempoEntreSpawns: 5
-  firstPersonCam: {fileID: 6799218991386280711}
-  thirdPersonCam: {fileID: 2364911841665772559}
+  - {fileID: 7353203230046782654, guid: dde0f63ca7a312349afadfe65cd991f4, type: 3}
+  - {fileID: 1505255193897438195, guid: 9cb5d8ec6910ab349ae1bcca71e83304, type: 3}
+  - {fileID: 2102358251812516651, guid: 12cd442611ba3814d87bdd4d730b7ffa, type: 3}
+  - {fileID: 2466378722507339955, guid: 2e8bacd303c6b9040937d2e144a6a32b, type: 3}
+  - {fileID: 2466378722507339955, guid: 2e8bacd303c6b9040937d2e144a6a32b, type: 3}
+  - {fileID: 1108869168899840396, guid: 69c376529fde7b243910c309fb85bfcd, type: 3}
+  maxZombiesTotales: 2
+  tiempoChequeo: 6
+  velocidadInicial: 3.5
+  aumentoPorBaja: 0.15
+  velocidadMaxima: 7.5
   minDistance: 15
   maxDistance: 40
 --- !u!4 &301295868
@@ -7089,6 +7090,7 @@ GameObject:
   - component: {fileID: 8997996946999327807}
   - component: {fileID: 8997996946999327806}
   - component: {fileID: 8997996946999327805}
+  - component: {fileID: 8997996946999327808}
   m_Layer: 8
   m_Name: Jugador
   m_TagString: Untagged
@@ -7951,6 +7953,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 94e64440ff5bf5a47a242ec864136a64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8997996946999327808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8616685848840234626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b6501244c613244685e05adcefbedff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &9034299109067038031
