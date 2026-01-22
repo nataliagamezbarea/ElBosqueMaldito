@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class BulletProjectile : MonoBehaviour {
@@ -22,6 +23,7 @@ public class BulletProjectile : MonoBehaviour {
 
     private void OnTriggerEnter(Collider other) {
         if (other.CompareTag("Enemy")) {
+            Debug.Log("Hit Enemy");
             Instantiate(vfxHitGreen, transform.position, Quaternion.identity);
         } else {
             Instantiate(vfxHitRed, transform.position, Quaternion.identity);
