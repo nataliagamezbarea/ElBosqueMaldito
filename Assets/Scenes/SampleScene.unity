@@ -2787,14 +2787,14 @@ Terrain:
   m_Enabled: 1
   serializedVersion: 6
   m_TerrainData: {fileID: 15600000, guid: 736c8338ef79eb142a8e01a8a3bb6695, type: 2}
-  m_TreeDistance: 1000
-  m_TreeBillboardDistance: 300
+  m_TreeDistance: 163
+  m_TreeBillboardDistance: 52
   m_TreeCrossFadeLength: 5
   m_TreeMaximumFullLODCount: 50
-  m_DetailObjectDistance: 200
+  m_DetailObjectDistance: 24
   m_DetailObjectDensity: 1
-  m_HeightmapPixelError: 5
-  m_SplatMapDistance: 1000
+  m_HeightmapPixelError: 140.9
+  m_SplatMapDistance: 110
   m_HeightmapMinimumLODSimplification: 0
   m_HeightmapMaximumLOD: 0
   m_ShadowCastingMode: 2
@@ -7633,7 +7633,7 @@ MonoBehaviour:
     - name: 1Terrain_layer1
       layerID: 0
       threshold: 0
-    instanceCount: 198328
+    instanceCount: 785755
     index: 0
     type: 0
     renderAsBillboard: 0
