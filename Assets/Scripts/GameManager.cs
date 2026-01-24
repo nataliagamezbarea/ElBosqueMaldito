@@ -8,6 +8,16 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("Juego");
     }
 
+    public void VolverAJugar()
+    {
+        SceneManager.LoadScene("Juego");
+    }
+
+    public void SiguienteNivel()
+    {
+        SceneManager.LoadScene("Juego");
+    }
+
     public void SalirDelJuego()
     {
         Application.Quit();

@@ -24,6 +24,10 @@ MonoBehaviour:
     m_path: Assets/Scenes/MenuPrincipal.unity
   - m_enabled: 1
     m_path: Assets/Scenes/Juego.unity
+  - m_enabled: 1
+    m_path: Assets/Scenes/Victoria.unity
+  - m_enabled: 1
+    m_path: Assets/Scenes/Derrota.unity
   m_ScriptingDefines:
   - 
   m_PlayerSettingsYaml:

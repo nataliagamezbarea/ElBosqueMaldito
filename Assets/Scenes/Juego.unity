@@ -280,7 +280,7 @@ GameObject:
   - component: {fileID: 301295868}
   - component: {fileID: 301295867}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: GeneradorZombies
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
