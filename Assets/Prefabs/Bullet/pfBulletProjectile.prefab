@@ -56,7 +56,7 @@ TrailRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 766c85aeedb73a84486cc32dfe01381a, type: 2}
+  - {fileID: 2100000, guid: 2b5dda185d1c37a69812b4014f055b74, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -86,8 +86,8 @@ TrailRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0
-        value: 0.0652593
+        time: 0.0037612915
+        value: 0.07316335
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -145,7 +145,7 @@ TrailRenderer:
     generateLightingData: 1
   m_MinVertexDistance: 0.01
   m_MaskInteraction: 0
-  m_Autodestruct: 1
+  m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
 --- !u!1 &6863857337172796869
@@ -244,8 +244,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3573ad16fd29d1947bad6326a2ccc872, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxHitGreen: {fileID: 613433886817584985, guid: b4dae11efd45f114f8d15c7ceb30c645, type: 3}
   vfxHitRed: {fileID: 613433886817584985, guid: 4974dd6e6d72ffb4b9ec94980ceb8b91, type: 3}
+  vfxHitYellow: {fileID: 613433886817584985, guid: 7756d893c750064e1a3050cb501b8f77, type: 3}
 --- !u!1 &6863857337905034704
 GameObject:
   m_ObjectHideFlags: 0

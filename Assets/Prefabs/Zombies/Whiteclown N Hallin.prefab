@@ -1037,6 +1037,10 @@ GameObject:
   - component: {fileID: 1532407169497593516}
   - component: {fileID: 1726107740142638265}
   - component: {fileID: 1373696629210726934}
+  - component: {fileID: 4426909245532817265}
+  - component: {fileID: 393594148863695390}
+  - component: {fileID: 8593306974539891398}
+  - component: {fileID: -4920036015752386023}
   m_Layer: 10
   m_Name: Whiteclown N Hallin
   m_TagString: Enemy
@@ -1118,8 +1122,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4122f33ef90c4cb40b9ffe222461c1b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackDistance: 1.2
-  attackCooldown: 2
+  distanciaAtaque: 1.5
+  tiempoEntreAtaques: 2
+  duracionRetirada: 1.5
+  saludMaxima: 3
 --- !u!54 &1532407169497593516
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1197,6 +1203,145 @@ LODGroup:
     renderers:
     - renderer: {fileID: 5572916294834266226}
   m_Enabled: 1
+--- !u!82 &4426909245532817265
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2466378722507339955}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &393594148863695390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2466378722507339955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b51b6512d32e4623e9631abcf7ef7ba2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clipAmbienteZombi: {fileID: 0}
+--- !u!114 &8593306974539891398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2466378722507339955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4122f33ef90c4cb40b9ffe222461c1b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  distanciaAtaque: 1.5
+  tiempoEntreAtaques: 2
+  duracionRetirada: 1.5
+  saludMaxima: 3
+--- !u!114 &-4920036015752386023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2466378722507339955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c91878db6544f36fd9dfb78456b54487, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  salud: 30
 --- !u!1 &2487907705317767056
 GameObject:
   m_ObjectHideFlags: 0
