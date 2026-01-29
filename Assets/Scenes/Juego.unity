@@ -304,8 +304,8 @@ MonoBehaviour:
   - {fileID: 2102358251812516651, guid: 12cd442611ba3814d87bdd4d730b7ffa, type: 3}
   - {fileID: 2466378722507339955, guid: 2e8bacd303c6b9040937d2e144a6a32b, type: 3}
   - {fileID: 1108869168899840396, guid: 69c376529fde7b243910c309fb85bfcd, type: 3}
-  maxZombiesTotales: 2
-  maxZombisSimultaneos: 10
+  maxZombiesTotales: 10
+  maxZombisSimultaneos: 1
   tiempoChequeo: 6
   velocidadInicial: 3.5
   aumentoPorBaja: 0.15
@@ -628,13 +628,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54a9cbce832b6444583ed1ab40f34031, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sonidos:
-  - nombre: Disparo
-    clip: {fileID: 8300000, guid: 956190b10d1f82248afe6772afe2f646, type: 3}
-    volumen: 1
-    tono: 1
-    loop: 0
-    source: {fileID: 0}
+  musicaJuego: {fileID: 0}
+  musicaVictoria: {fileID: 0}
+  musicaDerrota: {fileID: 0}
+  sonidoTension: {fileID: 0}
+  sonidoDisparo: {fileID: 0}
+  sonidoRecarga: {fileID: 0}
+  sonidoGrito: {fileID: 0}
+  sonidoPickupVida: {fileID: 0}
+  sonidoLatido: {fileID: 0}
+  sonidoPickupEscudo: {fileID: 0}
+  sonidoMordida: {fileID: 0}
+  sonidoMuerteZombi: {fileID: 0}
 --- !u!4 &548022856
 Transform:
   m_ObjectHideFlags: 0
@@ -1119,7 +1124,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54a9cbce832b6444583ed1ab40f34031, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sonidos: []
+  musicaJuego: {fileID: 0}
+  musicaVictoria: {fileID: 0}
+  musicaDerrota: {fileID: 0}
+  sonidoTension: {fileID: 0}
+  sonidoDisparo: {fileID: 0}
+  sonidoRecarga: {fileID: 0}
+  sonidoGrito: {fileID: 0}
+  sonidoPickupVida: {fileID: 0}
+  sonidoLatido: {fileID: 0}
+  sonidoPickupEscudo: {fileID: 0}
+  sonidoMordida: {fileID: 0}
+  sonidoMuerteZombi: {fileID: 0}
 --- !u!4 &787086753
 Transform:
   m_ObjectHideFlags: 0

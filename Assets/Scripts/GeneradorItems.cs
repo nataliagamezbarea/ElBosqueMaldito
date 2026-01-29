@@ -11,9 +11,16 @@ public class GeneradorItems : MonoBehaviour
     public float intervaloGeneracion = 3f;
     public float alturaSpawn = 1f; // Altura extra sobre el suelo
 
-    [Header("Generación Aleatoria")]
-    public float radioMinimo = 5f;
-    public float radioMaximo = 20f;
+    [Header("Configuración Vida")]
+    public float radioMinimoVida = 5f;
+    public float radioMaximoVida = 20f;
+    public bool spawnEstrategicoVida = true; // Intenta aparecer entre zombi y jugador
+
+    [Header("Configuración Escudo")]
+    public float radioMinimoEscudo = 10f;
+    public float radioMaximoEscudo = 30f;
+    public bool spawnEstrategicoEscudo = false; // Aleatorio puro (más lejos)
+
     private SaludJugador saludJugador; // Se buscará automáticamente
 
     // Pools
@@ -79,22 +86,22 @@ public class GeneradorItems : MonoBehaviour
             // Si tus variables son privadas, necesitarás crear un método público bool TieneSaludCompleta()
             if (saludJugador != null && saludJugador.saludActual < saludJugador.saludMaxima)
             {
-                ActivarItemDelPool(poolVidas, prefabVida);
+                ActivarItemDelPool(poolVidas, prefabVida, radioMinimoVida, radioMaximoVida, spawnEstrategicoVida);
             }
             else
             {
                 // MEJORA: Si la vida está llena, generamos un escudo en su lugar para no perder el turno
-                ActivarItemDelPool(poolEscudos, prefabEscudo);
+                ActivarItemDelPool(poolEscudos, prefabEscudo, radioMinimoEscudo, radioMaximoEscudo, spawnEstrategicoEscudo);
             }
         }
         else
         {
             // El escudo se puede generar siempre
-            ActivarItemDelPool(poolEscudos, prefabEscudo);
+            ActivarItemDelPool(poolEscudos, prefabEscudo, radioMinimoEscudo, radioMaximoEscudo, spawnEstrategicoEscudo);
         }
     }
 
-    private void ActivarItemDelPool(List<GameObject> pool, GameObject prefabReferencia)
+    private void ActivarItemDelPool(List<GameObject> pool, GameObject prefabReferencia, float minRadio, float maxRadio, bool usarEstrategia)
     {
         // Buscar un objeto inactivo en el pool
         foreach (GameObject item in pool)
@@ -110,7 +117,7 @@ public class GeneradorItems : MonoBehaviour
                     // 1. LÓGICA MEJORADA: Buscamos el zombi más cercano y ponemos el ítem ENTRE él y tú
                     GameObject[] zombies = GameObject.FindGameObjectsWithTag("Enemy");
                     
-                    if (zombies.Length > 0)
+                    if (usarEstrategia && zombies.Length > 0)
                     {
                         GameObject zombieMasCercano = null;
                         float distMinSqr = float.MaxValue;
@@ -138,7 +145,7 @@ public class GeneradorItems : MonoBehaviour
                     // 2. Fallback: Si no hay zombis, aleatorio alrededor del jugador
                     if (!destinoCalculado)
                     {
-                        Vector2 circulo = Random.insideUnitCircle.normalized * Random.Range(radioMinimo, radioMaximo);
+                        Vector2 circulo = Random.insideUnitCircle.normalized * Random.Range(minRadio, maxRadio);
                         destino = posicionJugador + new Vector3(circulo.x, 0, circulo.y);
                     }
 

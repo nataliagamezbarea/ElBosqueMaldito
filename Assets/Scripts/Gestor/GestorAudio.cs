@@ -152,7 +152,7 @@ public class GestorAudio : MonoBehaviour
     {
         if (sonidoMuerteZombi != null) 
         {
-            AudioSource.PlayClipAtPoint(sonidoMuerteZombi, position);
+            AudioSource.PlayClipAtPoint(sonidoMuerteZombi, position, 0.6f);
         }
         else
         {

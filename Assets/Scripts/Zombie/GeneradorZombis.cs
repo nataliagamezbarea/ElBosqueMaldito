@@ -87,42 +87,9 @@ public class GeneradorZombis : MonoBehaviour
 
         if (tieneEscudo != modoEscudoActivo) {
             modoEscudoActivo = tieneEscudo;
-            ActualizarComportamientoZombis();
         }
 
         ActualizarMusicaTension();
-    }
-
-    void ActualizarComportamientoZombis() {
-        for (int i = listaZombisActivos.Count - 1; i >= 0; i--) {
-            GameObject z = listaZombisActivos[i];
-            if (z == null || !z.activeInHierarchy) {
-                listaZombisActivos.RemoveAt(i);
-                continue;
-            }
-
-            var nav = z.GetComponent<NavMeshAgent>();
-            var ctrl = z.GetComponent<ControladorZombi>();
-            var anim = z.GetComponent<Animator>();
-
-            if (modoEscudoActivo) {
-                if (ctrl != null) {
-                    ctrl.StopAllCoroutines(); // Detiene ataques que usen yield return
-                    ctrl.CancelInvoke();      // Detiene ataques programados
-                    ctrl.enabled = false;
-                }
-                if (nav != null && nav.isOnNavMesh) {
-                    nav.isStopped = true;
-                    nav.velocity = Vector3.zero;
-                    nav.ResetPath();
-                }
-                if (anim != null) anim.speed = 0; // Congela la animación (golpes en el aire)
-            } else {
-                if (nav != null && nav.isOnNavMesh) nav.isStopped = false;
-                if (ctrl != null) ctrl.enabled = true;
-                if (anim != null) anim.speed = 1; // Reanuda la animación
-            }
-        }
     }
 
     void ActualizarMusicaTension()

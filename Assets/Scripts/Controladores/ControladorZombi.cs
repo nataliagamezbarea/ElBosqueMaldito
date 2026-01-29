@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿using UnityEngine;
+﻿﻿using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 
@@ -117,7 +117,6 @@ public class ControladorZombi : MonoBehaviour
         }
 
         // --- CORRECCIÓN CRÍTICA PARA EL ESCUDO ---
-        // Si el jugador tiene el escudo (Tag Untagged), el zombie lo pierde de vista
         if (jugador.CompareTag("Untagged"))
         {
             if (estadoActual != EstadoZombi.Deambulando)
@@ -150,39 +149,42 @@ public class ControladorZombi : MonoBehaviour
         ProcesarSonidos();
     }
 
+    // --- MÉTODOS DE CONTROL DE MOVIMIENTO ---
+
+    private void ControlarMovimiento(float speed, bool run, bool walk)
+    {
+        agente.isStopped = false;
+        agente.speed = speed;
+        animador.SetBool("isRunning", run);
+        animador.SetBool("isWalking", walk);
+    }
+
     private void DetenerZombi()
     {
         if (agente.isOnNavMesh) 
         {
-            agente.ResetPath(); // Borra el destino guardado (el zombie "olvida")
             agente.isStopped = true;
         }
         animador.SetBool("isRunning", false);
+        animador.SetBool("isWalking", false);
     }
+
+    // --- ESTADOS DE LA IA ---
 
     private void EstadoPersecucion()
     {
-        // OPTIMIZACIÓN: sqrMagnitude es mucho más rápido que Distance
         float distanciaSqr = (transform.position - jugador.position).sqrMagnitude;
         
-        // MODIFICACIÓN: Si ya hay un atacante activo y no soy yo, merodeo alrededor sin parar.
         if (atacanteActual != null && atacanteActual != this && atacanteActual.gameObject.activeInHierarchy)
         {
-            agente.speed = velocidadCaminar; // Se mueven despacio al merodear
-            agente.isStopped = false;
-            animador.SetBool("isRunning", true);
+            ControlarMovimiento(velocidadCaminar, false, true); // Camina mientras merodea
 
-            // Si llegamos al destino de espera o no tenemos uno, buscamos otro punto alrededor
             if (!agente.hasPath || agente.remainingDistance < 1.0f)
             {
-                // Calculamos una posición en un círculo alrededor del jugador (distancia 3 a 6 metros)
                 Vector3 dirDesdeJugador = (transform.position - jugador.position).normalized;
                 if (dirDesdeJugador == Vector3.zero) dirDesdeJugador = transform.forward;
-                
-                // Variación aleatoria lateral para que se muevan alrededor sin cruzar por el medio
                 Vector3 variacion = Vector3.Cross(dirDesdeJugador, Vector3.up) * Random.Range(-0.8f, 0.8f);
                 Vector3 dirFinal = (dirDesdeJugador + variacion).normalized;
-
                 float radioEspera = Random.Range(3.0f, 6.0f);
                 Vector3 destino = jugador.position + dirFinal * radioEspera;
 
@@ -195,61 +197,29 @@ public class ControladorZombi : MonoBehaviour
             return;
         }
 
-        agente.speed = velocidadCorrer; // Corren al perseguir
-
         if (distanciaSqr <= distanciaAtaqueSqr)
         {
-            float distancia = Mathf.Sqrt(distanciaSqr); // Solo calculamos la raíz si estamos cerca
             if (Time.time < tiempoUltimoAtaque + tiempoEntreAtaques)
             {
-                agente.isStopped = true;
-                animador.SetBool("isRunning", false);
+                DetenerZombi();
                 transform.LookAt(jugador.position);
                 return;
             }
 
-            bool puedoAtacar = false;
-
-            if (atacanteActual == null)
-            {
-                puedoAtacar = true;
-            }
-            else if (atacanteActual != this)
-            {
-                if (!atacanteActual.gameObject.activeInHierarchy)
-                {
-                    puedoAtacar = true;
-                }
-                else
-                {
-                    float distanciaOtro = Vector3.Distance(atacanteActual.transform.position, jugador.position);
-                    if (distancia < distanciaOtro - 0.2f)
-                    {
-                        atacanteActual.InterrumpirAtaque();
-                        puedoAtacar = true;
-                    }
-                }
-                // ELIMINADO: Ya no interrumpimos al atacante actual aunque estemos más cerca.
-                // Esto asegura que sea un 1 contra 1 estricto.
-            }
-
-            if (puedoAtacar)
+            if (atacanteActual == null || atacanteActual == this || !atacanteActual.gameObject.activeInHierarchy)
             {
                 atacanteActual = this;
                 estadoActual = EstadoZombi.Atacando;
             }
             else
             {
-                agente.isStopped = true;
-                animador.SetBool("isRunning", false);
+                DetenerZombi();
                 transform.LookAt(jugador.position);
             }
             return;
         }
 
-        agente.isStopped = false;
-        animador.SetBool("isRunning", true);
-
+        ControlarMovimiento(velocidadCorrer, true, false); // Corre al perseguir
         if (Time.frameCount % 5 == 0)
         {
             agente.SetDestination(jugador.position);
@@ -258,15 +228,13 @@ public class ControladorZombi : MonoBehaviour
 
     private void EstadoAtaque()
     {
-        // Doble verificación: si de pronto el jugador activa el escudo en medio de la animación de ataque
         if (jugador.CompareTag("Untagged"))
         {
             estadoActual = EstadoZombi.Persiguiendo;
             return;
         }
 
-        agente.isStopped = true;
-        animador.SetBool("isRunning", false);
+        DetenerZombi();
         if (jugador != null) transform.LookAt(jugador.position);
 
         if (Time.time > tiempoUltimoAtaque + tiempoEntreAtaques)
@@ -274,10 +242,7 @@ public class ControladorZombi : MonoBehaviour
             tiempoUltimoAtaque = Time.time;
             animador.SetTrigger("bite");
             
-            if (GestorAudio.Instancia != null) 
-            {
-                GestorAudio.Instancia.ReproducirMordida();
-            }
+            if (GestorAudio.Instancia != null) GestorAudio.Instancia.ReproducirMordida();
             if (GestorJuego.Instancia != null) GestorJuego.Instancia.PerderVida();
 
             if (atacanteActual == this) atacanteActual = null;
@@ -299,9 +264,7 @@ public class ControladorZombi : MonoBehaviour
 
     private void EstadoRetirada()
     {
-        agente.isStopped = false;
-        animador.SetBool("isRunning", true);
-
+        ControlarMovimiento(velocidadCorrer, true, false);
         Vector3 lejosDelJugador = transform.position - jugador.position;
         agente.SetDestination(transform.position + lejosDelJugador.normalized * 2f);
 
@@ -313,11 +276,7 @@ public class ControladorZombi : MonoBehaviour
 
     private void EstadoDeambulacion()
     {
-        agente.speed = velocidadCaminar; // Caminan si el jugador tiene escudo
-        // Aseguramos que la animación sea la misma que al perseguir (isRunning)
-        if (agente.isStopped) agente.isStopped = false;
-        animador.SetBool("isRunning", true);
-
+        ControlarMovimiento(velocidadCaminar, false, true);
         if (!agente.pathPending && agente.remainingDistance <= agente.stoppingDistance)
         {
             BuscarDestinoAleatorio();
@@ -326,12 +285,8 @@ public class ControladorZombi : MonoBehaviour
 
     private void BuscarDestinoAleatorio()
     {
-        agente.isStopped = false;
-        animador.SetBool("isRunning", true); // Activa la animación de caminar/correr
-        
         Vector3 randomDirection = Random.insideUnitSphere * 10f;
         randomDirection += transform.position;
-        
         NavMeshHit hit;
         if (NavMesh.SamplePosition(randomDirection, out hit, 10f, NavMesh.AllAreas))
         {
@@ -341,93 +296,58 @@ public class ControladorZombi : MonoBehaviour
 
     public void RecibirDano(int dano)
     {
-        if (estaMuerto) return; // Evita que muera múltiples veces si recibe mucho daño rápido
-
+        if (estaMuerto) return;
         saludActual -= dano;
-        if (saludActual <= 0)
-        {
-            AlMorir();
-        }
+        if (saludActual <= 0) AlMorir();
     }
 
     void AlMorir()
     {
         if (estaMuerto) return;
         estaMuerto = true;
-
-        // Liberamos el turno de ataque inmediatamente al morir para que venga el siguiente
         if (atacanteActual == this) atacanteActual = null;
 
-        if (GestorAudio.Instancia != null)
-        {
-            GestorAudio.Instancia.ReproducirSonidoMuerteZombi(transform.position);
-        }
+        if (GestorAudio.Instancia != null) GestorAudio.Instancia.ReproducirSonidoMuerteZombi(transform.position);
         
-        if (agente != null)
-        {
-            if (agente.isOnNavMesh) agente.ResetPath();
-            agente.enabled = false;
-        }
+        DetenerZombi();
+        agente.enabled = false;
+        GetComponent<Collider>().enabled = false;
 
-        Collider col = GetComponent<Collider>();
-        if (col != null) col.enabled = false;
-
-        // Restauramos esto: Al quitar el collider, si tiene Rigidbody y gravedad, se cae al vacío.
-        // Lo ponemos kinematic para que se quede en el sitio reproduciendo la animación.
         Rigidbody rb = GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            rb.isKinematic = true;
-        }
+        if (rb != null) rb.isKinematic = true;
 
-        if (animador != null) animador.SetBool("die", true);
-
+        animador.SetBool("die", true);
         StartCoroutine(EsperarYDesaparecer());
     }
 
     IEnumerator EsperarYDesaparecer()
     {
         yield return new WaitForSeconds(3f);
-
-        if (miGenerador != null) 
-        {
-            miGenerador.ZombieMuerto(gameObject);
-        }
-        else 
-            gameObject.SetActive(false);
+        if (miGenerador != null) miGenerador.ZombieMuerto(gameObject);
+        else gameObject.SetActive(false);
     }
 
     void ProcesarSonidos()
     {
-        // Sonidos de ambiente (gemidos aleatorios)
-        if (Time.time > tiempoSiguienteGemido)
+        if (Time.time > tiempoSiguienteGemido && !estaMuerto)
         {
-            if (!estaMuerto)
-            {
-                AudioClip clip = null;
-                float distSqr = (jugador != null) ? (transform.position - jugador.position).sqrMagnitude : float.MaxValue;
+            AudioClip clip = null;
+            float distSqr = (jugador != null) ? (transform.position - jugador.position).sqrMagnitude : float.MaxValue;
 
-                // Si está a menos de 5 metros (25 sqr) y tenemos sonidos de cerca
-                if (distSqr < 25f && sonidosCerca != null && sonidosCerca.Length > 0)
-                    clip = sonidosCerca[Random.Range(0, sonidosCerca.Length)];
-                else if (sonidosAmbiente != null && sonidosAmbiente.Length > 0)
-                    clip = sonidosAmbiente[Random.Range(0, sonidosAmbiente.Length)];
+            if (distSqr < 25f && sonidosCerca != null && sonidosCerca.Length > 0)
+                clip = sonidosCerca[Random.Range(0, sonidosCerca.Length)];
+            else if (sonidosAmbiente != null && sonidosAmbiente.Length > 0)
+                clip = sonidosAmbiente[Random.Range(0, sonidosAmbiente.Length)];
 
-                if (clip != null) audioSourcePropio.PlayOneShot(clip);
-            }
+            if (clip != null) audioSourcePropio.PlayOneShot(clip, 0.6f);
             tiempoSiguienteGemido = Time.time + Random.Range(4f, 12f);
         }
 
-        // Sonidos de pasos (si se está moviendo)
-        if (agente.velocity.sqrMagnitude > 0.2f && !estaMuerto)
+        if (agente.velocity.sqrMagnitude > 0.2f && !estaMuerto && Time.time > tiempoSiguientePaso)
         {
-            if (Time.time > tiempoSiguientePaso)
-            {
-                if (sonidosPasos.Length > 0) audioSourcePropio.PlayOneShot(sonidosPasos[Random.Range(0, sonidosPasos.Length)], 0.6f);
-                // Ajustar frecuencia de pasos según velocidad
-                float intervalo = estadoActual == EstadoZombi.Deambulando ? 0.6f : 0.35f;
-                tiempoSiguientePaso = Time.time + intervalo;
-            }
+            if (sonidosPasos.Length > 0) audioSourcePropio.PlayOneShot(sonidosPasos[Random.Range(0, sonidosPasos.Length)], 0.6f);
+            float intervalo = estadoActual == EstadoZombi.Deambulando ? 0.6f : 0.35f;
+            tiempoSiguientePaso = Time.time + intervalo;
         }
     }
 }
