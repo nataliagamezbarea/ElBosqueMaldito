@@ -93,6 +93,7 @@ public class GestorAudio : MonoBehaviour
         ActualizarMusica(escena.name);
         if (fuenteTension != null) fuenteTension.volume = 0f;
         if (fuenteLatido != null) fuenteLatido.Stop();
+        if (fuenteEfectos != null) fuenteEfectos.Stop();
     }
 
     public void ActualizarMusica(string nombreEscena)
