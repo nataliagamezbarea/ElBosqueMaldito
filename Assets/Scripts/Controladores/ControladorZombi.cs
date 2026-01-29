@@ -75,6 +75,12 @@ public class ControladorZombi : MonoBehaviour
         // Si el zombi está puesto manualmente en la escena, aseguramos que tenga vida
         if (saludActual <= 0) saludActual = saludMaxima;
         distanciaAtaqueSqr = distanciaAtaque * distanciaAtaque; // Pre-calculamos
+
+        // Aseguramos que el agente se acerque lo suficiente para atacar
+        if (agente != null) agente.stoppingDistance = 0.1f;
+
+        // Permitir atacar inmediatamente al primer contacto
+        tiempoUltimoAtaque = -tiempoEntreAtaques;
     }
 
     void OnDisable()
@@ -197,28 +203,6 @@ public class ControladorZombi : MonoBehaviour
             return;
         }
 
-        if (distanciaSqr <= distanciaAtaqueSqr)
-        {
-            if (Time.time < tiempoUltimoAtaque + tiempoEntreAtaques)
-            {
-                DetenerZombi();
-                transform.LookAt(jugador.position);
-                return;
-            }
-
-            if (atacanteActual == null || atacanteActual == this || !atacanteActual.gameObject.activeInHierarchy)
-            {
-                atacanteActual = this;
-                estadoActual = EstadoZombi.Atacando;
-            }
-            else
-            {
-                DetenerZombi();
-                transform.LookAt(jugador.position);
-            }
-            return;
-        }
-
         ControlarMovimiento(velocidadCorrer, true, false); // Corre al perseguir
         if (Time.frameCount % 5 == 0)
         {
@@ -245,6 +229,17 @@ public class ControladorZombi : MonoBehaviour
             if (GestorAudio.Instancia != null) GestorAudio.Instancia.ReproducirMordida();
             if (GestorJuego.Instancia != null) GestorJuego.Instancia.PerderVida();
 
+            // Empuje (Knockback) al jugador
+            if (jugador != null)
+            {
+                Rigidbody rbJugador = jugador.GetComponent<Rigidbody>();
+                if (rbJugador != null)
+                {
+                    Vector3 dirEmpuje = (jugador.position - transform.position).normalized;
+                    rbJugador.AddForce(dirEmpuje * 5f, ForceMode.Impulse);
+                }
+            }
+
             if (atacanteActual == this) atacanteActual = null;
             estadoActual = EstadoZombi.Retirandose;
             tiempoSiguienteEstado = Time.time + duracionRetirada;
@@ -254,6 +249,25 @@ public class ControladorZombi : MonoBehaviour
             if (atacanteActual == this) atacanteActual = null;
             estadoActual = EstadoZombi.Persiguiendo;
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player") && !estaMuerto)
+        {
+            if (estadoActual != EstadoZombi.Atacando && estadoActual != EstadoZombi.Retirandose)
+            {
+                Debug.Log("Zombi: Colisión física -> ATACANDO");
+                atacanteActual = this;
+                estadoActual = EstadoZombi.Atacando;
+            }
+        }
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        // Mantenemos el ataque si seguimos colisionando
+        OnCollisionEnter(collision);
     }
 
     public void InterrumpirAtaque()
