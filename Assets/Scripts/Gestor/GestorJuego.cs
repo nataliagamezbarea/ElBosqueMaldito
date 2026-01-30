@@ -83,9 +83,6 @@ public class GestorJuego : MonoBehaviour
         EstaPausado = !EstaPausado;
         Time.timeScale = EstaPausado ? 0f : 1f;
 
-        Cursor.lockState = EstaPausado ? CursorLockMode.None : CursorLockMode.Locked;
-        Cursor.visible = EstaPausado;
-        
         if (juegoTerminado)
         {
             Cursor.lockState = CursorLockMode.None;

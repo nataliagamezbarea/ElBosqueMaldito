@@ -1,20 +1,35 @@
 using UnityEngine;
+using System.Collections;
 
 public class Bala : MonoBehaviour
 {
-    public int dano = 10;
+    public int dano = 1;
+    public float tiempoDeVida = 3f;
 
-    void Start()
+    private void OnEnable()
     {
-        Destroy(gameObject, 3f);
+        StartCoroutine(RutinaDevolverDespuesDeTiempo());
+    }
+
+    private IEnumerator RutinaDevolverDespuesDeTiempo()
+    {
+        yield return new WaitForSeconds(tiempoDeVida);
+        GestorPools.Instancia.DevolverAGrupo("ProyectilBala", gameObject);
     }
 
     void OnCollisionEnter(Collision collision)
     {
+        StopAllCoroutines();
+
         if (collision.gameObject.CompareTag("Zombie"))
         {
-            collision.gameObject.GetComponent<SaludZombi>().RecibirDano(dano);
+            ControladorZombi zombi = collision.gameObject.GetComponent<ControladorZombi>();
+            if (zombi != null)
+            {
+                zombi.RecibirDano(dano);
+            }
         }
-        Destroy(gameObject);
+        
+        GestorPools.Instancia.DevolverAGrupo("ProyectilBala", gameObject);
     }
 }

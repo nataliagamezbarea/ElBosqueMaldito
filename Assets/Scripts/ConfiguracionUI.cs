@@ -27,6 +27,11 @@ public class ConfiguracionUI : MonoBehaviour
             GestorJuego.Instancia.AlCambiarPuntuacion += ActualizarTextoPuntuacion;
             GestorJuego.Instancia.AlCambiarZombis += ActualizarTextoZombis;
             GestorJuego.Instancia.AlCambiarVidas += ActualizarVidasUI;
+
+            // Actualizar la UI con los valores iniciales al activarse
+            ActualizarTextoPuntuacion(GestorJuego.Instancia.Puntuacion);
+            ActualizarTextoZombis(GestorJuego.Instancia.ZombisMatados, GestorJuego.Instancia.TotalZombis);
+            ActualizarVidasUI(GestorJuego.Instancia.Vidas);
         }
     }
 
@@ -42,22 +47,12 @@ public class ConfiguracionUI : MonoBehaviour
 
     void Start()
     {
-        if (GestorJuego.Instancia != null)
+        // La suscripción a eventos y la actualización inicial ahora se manejan en OnEnable
+        // para asegurar que la UI se actualice correctamente si el objeto se activa/desactiva.
+        // Si no se encuentra el GestorJuego, OnEnable no hará nada.
+        if (GestorJuego.Instancia == null)
         {
-            GestorJuego.Instancia.AlCambiarPuntuacion -= ActualizarTextoPuntuacion;
-            GestorJuego.Instancia.AlCambiarPuntuacion += ActualizarTextoPuntuacion;
-            GestorJuego.Instancia.AlCambiarZombis -= ActualizarTextoZombis;
-            GestorJuego.Instancia.AlCambiarZombis += ActualizarTextoZombis;
-            GestorJuego.Instancia.AlCambiarVidas -= ActualizarVidasUI;
-            GestorJuego.Instancia.AlCambiarVidas += ActualizarVidasUI;
-
-            ActualizarTextoPuntuacion(GestorJuego.Instancia.Puntuacion);
-            ActualizarTextoZombis(GestorJuego.Instancia.ZombisMatados, GestorJuego.Instancia.TotalZombis);
-            ActualizarVidasUI(GestorJuego.Instancia.Vidas);
-        }
-        else
-        {
-            Debug.LogError("UISetup no pudo encontrar una instancia de GameManager.");
+            Debug.LogError("ConfiguracionUI no pudo encontrar una instancia de GestorJuego.");
         }
     }
 
@@ -65,7 +60,7 @@ public class ConfiguracionUI : MonoBehaviour
     {
         if (textoPuntuacion != null)
         {
-            textoPuntuacion.text = "Puntuación: " + puntuacion;
+            textoPuntuacion.SetText("Puntuación: {0}", puntuacion);
         }
     }
 
@@ -73,7 +68,7 @@ public class ConfiguracionUI : MonoBehaviour
     {
         if (textoZombisMatados != null)
         {
-            textoZombisMatados.text = "Zombies: " + matados + "/" + total;
+            textoZombisMatados.SetText("Zombies: {0}/{1}", matados, total);
         }
     }
 

@@ -30,6 +30,8 @@ public class GeneradorZombis : MonoBehaviour
 
     private List<GameObject> listaZombisActivos = new List<GameObject>();
     private bool modoEscudoActivo = false;
+    private float tiempoDesdeChequeoTension = 0f;
+    private const float INTERVALO_CHEQUEO_TENSION = 0.5f;
 
     IEnumerator Start() {
         velocidadActual = velocidadInicial;
@@ -89,7 +91,12 @@ public class GeneradorZombis : MonoBehaviour
             modoEscudoActivo = tieneEscudo;
         }
 
-        ActualizarMusicaTension();
+        tiempoDesdeChequeoTension += Time.deltaTime;
+        if (tiempoDesdeChequeoTension >= INTERVALO_CHEQUEO_TENSION)
+        {
+            ActualizarMusicaTension();
+            tiempoDesdeChequeoTension = 0f;
+        }
     }
 
     void ActualizarMusicaTension()

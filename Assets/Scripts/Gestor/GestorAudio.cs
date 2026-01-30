@@ -1,21 +1,25 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
+using System;
 
 public class GestorAudio : MonoBehaviour
 {
     public static GestorAudio Instancia;
 
-    // Fuentes internas (se crean solas, no hace falta arrastrarlas)
     private AudioSource fuenteMusica;
     private AudioSource fuenteEfectos; 
     private AudioSource fuenteTension; 
     private AudioSource fuenteLatido;
+    private List<AudioSource> fuentes3DPool;
+    private int proximaFuente3D = 0;
+    private const int TAMANO_POOL_3D = 15;
 
     [Header("Música de Fondo")]
     public AudioClip musicaJuego;
     public AudioClip musicaVictoria;
     public AudioClip musicaDerrota;
-    public AudioClip sonidoTension; // Nuevo campo para el loop de tensión
+    public AudioClip sonidoTension;
 
     [Header("Acciones Jugador")]
     public AudioClip sonidoDisparo;
@@ -40,22 +44,27 @@ public class GestorAudio : MonoBehaviour
             DontDestroyOnLoad(gameObject);
 
             // --- Configuración Automática de Fuentes ---
-            
-            // 1. Música (Loop, volumen normal)
             fuenteMusica = gameObject.AddComponent<AudioSource>();
             fuenteMusica.loop = true;
 
-            // 2. Efectos (Sin loop)
             fuenteEfectos = gameObject.AddComponent<AudioSource>();
 
-            // 3. Tensión (Loop, empieza en silencio)
             fuenteTension = gameObject.AddComponent<AudioSource>();
             fuenteTension.loop = true;
             fuenteTension.volume = 0f;
 
-            // 4. Latido (Loop, empieza parado)
             fuenteLatido = gameObject.AddComponent<AudioSource>();
             fuenteLatido.loop = true;
+
+            // --- Pool para Efectos 3D ---
+            fuentes3DPool = new List<AudioSource>(TAMANO_POOL_3D);
+            for (int i = 0; i < TAMANO_POOL_3D; i++)
+            {
+                AudioSource nuevaFuente = gameObject.AddComponent<AudioSource>();
+                nuevaFuente.spatialBlend = 1.0f; // Sonido 3D
+                nuevaFuente.playOnAwake = false;
+                fuentes3DPool.Add(nuevaFuente);
+            }
         }
         else
         {
@@ -65,7 +74,6 @@ public class GestorAudio : MonoBehaviour
 
         SceneManager.sceneLoaded += AlCargarEscena;
 
-        // Asignar clips de loops
         if (fuenteTension != null && sonidoTension != null)
         {
             fuenteTension.clip = sonidoTension;
@@ -73,7 +81,7 @@ public class GestorAudio : MonoBehaviour
         }
         else if (sonidoTension == null)
         {
-            Debug.LogWarning("GestorAudio: El campo 'Sonido Tension' está vacío. No habrá música de tensión.");
+            Debug.LogWarning("GestorAudio: El campo 'Sonido Tension' está vacío.");
         }
 
         if (fuenteLatido != null && sonidoLatido != null)
@@ -100,9 +108,8 @@ public class GestorAudio : MonoBehaviour
     {
         AudioClip clipAReproducir = musicaJuego;
 
-        string nombreLower = nombreEscena.ToLower();
-        if (nombreLower.Contains("victoria")) clipAReproducir = musicaVictoria;
-        else if (nombreLower.Contains("derrota")) clipAReproducir = musicaDerrota;
+        if (nombreEscena.IndexOf("victoria", StringComparison.OrdinalIgnoreCase) >= 0) clipAReproducir = musicaVictoria;
+        else if (nombreEscena.IndexOf("derrota", StringComparison.OrdinalIgnoreCase) >= 0) clipAReproducir = musicaDerrota;
 
         if (fuenteMusica != null)
         {
@@ -117,18 +124,36 @@ public class GestorAudio : MonoBehaviour
             }
             else
             {
-                // Si no hay música asignada (ej. Menu vacío), silencio total
                 fuenteMusica.Stop();
                 fuenteMusica.clip = null;
             }
         }
     }
 
+    private void ReproducirEnPunto(AudioClip clip, Vector3 posicion, float volumen = 1f)
+    {
+        if (clip == null) return;
+        
+        // Coge la siguiente fuente del pool en modo round-robin
+        AudioSource fuente = fuentes3DPool[proximaFuente3D];
+        proximaFuente3D = (proximaFuente3D + 1) % TAMANO_POOL_3D;
+
+        fuente.transform.position = posicion;
+        fuente.PlayOneShot(clip, volumen);
+    }
+
     public void ReproducirDisparo(Vector3 position)
     {
-        if (sonidoDisparo != null) AudioSource.PlayClipAtPoint(sonidoDisparo, position);
+        if (sonidoDisparo != null) ReproducirEnPunto(sonidoDisparo, position);
         else Debug.LogWarning("GestorAudio: El sonido 'Sonido Disparo' no está asignado.");
     }
+
+    public void ReproducirSonidoMuerteZombi(Vector3 position)
+    {
+        if (sonidoMuerteZombi != null) ReproducirEnPunto(sonidoMuerteZombi, position, 0.6f);
+        else Debug.LogWarning("GestorAudio: El sonido 'Sonido Muerte Zombi' no está asignado.");
+    }
+    
     public void ReproducirRecarga() => PlaySfx(sonidoRecarga, "Sonido Recarga");
     public void ReproducirMordida() => PlaySfx(sonidoMordida, "Sonido Mordida");
     public void ReproducirPickupEscudo() => PlaySfx(sonidoPickupEscudo, "Sonido Pickup Escudo");
@@ -149,28 +174,12 @@ public class GestorAudio : MonoBehaviour
         }
     }
 
-    public void ReproducirSonidoMuerteZombi(Vector3 position)
-    {
-        if (sonidoMuerteZombi != null) 
-        {
-            AudioSource.PlayClipAtPoint(sonidoMuerteZombi, position, 0.6f);
-        }
-        else
-        {
-            Debug.LogWarning("GestorAudio: El sonido 'Sonido Muerte Zombi' no está asignado.");
-        }
-    }
-
     public void ActualizarTension(float intensidad)
     {
         if (fuenteTension != null)
         {
-            // Si la intensidad es muy baja, bajamos el volumen rápido para que se calle pronto
             float velocidadCambio = intensidad < 0.01f ? 0.5f : 2f;
             fuenteTension.volume = Mathf.Lerp(fuenteTension.volume, intensidad, Time.deltaTime * 2f);
-            
-            // Debug opcional: Descomenta esto si quieres ver en consola cuándo sube la tensión
-            // if (intensidad > 0.1f) Debug.Log($"Tensión actual: {intensidad}");
         }
     }
 
